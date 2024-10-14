@@ -14,6 +14,12 @@
         <div class="map-container" id="mapContainer">
             <div id="map"></div>
         </div>
+        <div id="searchContainer">
+            <button id="homeButton" onclick="setup()">🏠</button>
+            <input type="text" id="searchInput" placeholder="Enter Bitmap Number" value="114588" />
+            <button id="searchButton">Search</button>
+            <select id="locationSelect"></select>
+        </div>
         <div class="sidebar">
             <img id="appLogo" src="app_logo.png" alt="App Logo">
             <button id="toggleSearchContainer" class="active">🔍</button>
@@ -24,21 +30,6 @@
             <button id="togglePathScribePanel">📐</button>
             <hr class="dashed">
             <button id="toggleControlPanel">⚙️</button>
-        </div>
-        <div class="controls" id="controlPanel">
-            <h3>Map Settings</h3>
-            <div class="controls-content">
-                <div>
-                    Import Path
-                    <input type="file" id="fileInput" accept=".json" />
-                </div>
-                <div>
-                    Import Map
-                    <input type="file" id="geojsonInput" accept=".geojson" />
-                </div>
-                <button id="removeButton">Remove Imported Path</button>
-                <button id="toggleTileLayerButton">Enable Tile Layer</button>
-            </div>
         </div>
         
         <div class="controls" id="appInfoPanel">
@@ -68,14 +59,20 @@
                 <h4>2️⃣ Metadata:</h4>
                 <label for="domainMapImage">Import your Map</label>
                 <input type="file" id="imageInput" accept="image/*">
-                <button id="removeMapButton" style="display: none;">Remove Map</button>
-                <label for="domainMap">Map Inscription:</label>
-                <input type="text" id="domainMapId">
+                <div id="mapBoundsControls">
+                    <button id="removeMapButton" style="display: none;">Remove Map</button>
+                    <p>Map Bounds:</p>
+                    <button id="editNorthEastButton">↗️NE</button><span id="northeastCoords"></span><br>
+                    <button id="editSouthWestButton">↙️SW</button><span id="southwestCoords"></span><br>
+                    <button id="fullSizeButton">Full Size</button>
+                    <p>❗ Ensure the imported image is the same with the Map Inscription</p>
+                    <label for="domainMap">Map Inscription:</label>
+                    <input type="text" id="domainMapId">
+                </div>
                 <label for="domainTarget">Target:</label>
                 <input type="text" id="domainTarget">
-                <h5>Hexagon Labels:</h5>
+                <p>Hexagon Labels:</p>
                 <div id="hexagonInputs">
-                    <!-- Create 6 input fields for hexagon values -->
                     <input type="text" class="hexagon-input" placeholder="Hexagon 1" value="Nature🌲" required>
                     <input type="text" class="hexagon-input" placeholder="Hexagon 2" value="Water💧" required>
                     <input type="text" class="hexagon-input" placeholder="Hexagon 3" value="Transportation🚌" required>
@@ -83,13 +80,7 @@
                     <input type="text" class="hexagon-input" placeholder="Hexagon 5" value="Animals🐾" required>
                     <input type="text" class="hexagon-input" placeholder="Hexagon 6" value="Dangerous⚠️" required>
                 </div>
-
-                <div id="mapBoundsControls">
-                    <h4>Map Bounds:</h4>
-                    <button id="editNorthEastButton">↗️NE</button><span id="northeastCoords"></span><br>
-                    <button id="editSouthWestButton">↙️SW</button><span id="southwestCoords"></span><br>
-                    <button id="fullSizeButton">Full Size</button>
-                </div>
+                
                 <button id="createDomainButton">Create Domain</button>
             </div>
         </div>
@@ -103,13 +94,14 @@
                 <h4>2️⃣ Metadata:</h4>
                 <label for="profileName">Name:</label>
                 <input type="text" id="profileName">
-                <label for="profileImg">Profile Image Inscription:</label>
-                <input type="text" id="profileImg">
+                
                 <label for="profileLocation">Location:</label>
                 <input type="text" id="profileLocation" disabled>
                 <button id="toggleLocationButton">Set Location🔒</button>
                 <label for="profileImage">Import Image to test</label>
                 <input type="file" id="profileImageInput" accept="image/*" disabled>
+                <label for="profileImg">Profile Image Inscription:</label>
+                <input type="text" id="profileImg">
                 <label for="profileTarget">Target:</label>
                 <input type="text" id="profileTarget">
                 <button id="createProfileButton">Create Pathscriber</button>
@@ -126,13 +118,6 @@
                     <button id="addPathButton" style="display: none;" disabled>Activate Add Path</button>
                     <span id="distanceDisplay"></span>
                 </div>
-                <div id="valueInputContainer">
-                    <input type="number" id="valueInput" min="0" max="9" step="1">
-                    <button id="updateValueButton">Update Value</button>
-                </div>
-                <div id="chart-container">
-                    <canvas id="radarChart"></canvas>
-                </div>
                 <button id="clearMapButton">Clear Map</button>
                 <button id="createContentButton">Create Content</button>
                 <h4>2️⃣ Metadata:</h4>
@@ -140,11 +125,30 @@
                 <input type="text" id="nameInput" />
                 <label for="infoInput">*Info:</label>
                 <input type="text" id="infoInput" />
+                <label for="radarInput">*Radar:</label>
+                <p>❗ Click on label to change value</p>
+                <div id="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
                 <button id="createMetadataButton">Create Metadata</button>
             </div>
         </div>
+        <div class="controls" id="controlPanel">
+            <h3>Map Settings</h3>
+            <div class="controls-content">
+                <div>
+                    Import Path
+                    <input type="file" id="fileInput" accept=".json" />
+                </div>
+                <div>
+                    Import Map
+                    <input type="file" id="geojsonInput" accept=".json" />
+                </div>
+                <button id="removeButton">Remove Imported Path</button>
+                <button id="toggleTileLayerButton">Enable Tile Layer</button>
+            </div>
+        </div>
     </div>
-
     <div class="panel" id="coordinatesPanel">
         <h3>Coordinates</h3>
         <div class="controls-content">
@@ -152,13 +156,6 @@
             <button onclick="copyToClipboard()">Copy to Clipboard</button>
             <button onclick="closePanel()">Close</button>
         </div>
-    </div>
-
-    <div id="searchContainer">
-        <button id="homeButton" onclick="setup()">🏠</button>
-        <input type="text" id="searchInput" placeholder="Enter Bitmap Number" value="114588" />
-        <button id="searchButton">Search</button>
-        <select id="locationSelect"></select>
     </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -184,7 +181,6 @@
         var geojsonLayer;
         var pathScribeMode = false;
         var addPathMode = false;
-        var inputMarker;
         var pathStartMarker;
         var pathEndMarker;
         var pathPolyline;
@@ -197,6 +193,7 @@
         var timePassedInterval;
         var firstCoordinateAdded = false;  // Track if the first coordinate has been added
         var domainMetadata = [];
+        var hexagonData = [];
         var imageOverlay;
         var imageBounds = [[40.355345, -3.687194], [43.476917, 1.4426]]; // Default bounds for initial loading
         var editingBoundary = null; // Track which boundary is being edited
@@ -218,6 +215,7 @@
         const removeMapButton = document.getElementById('removeMapButton');
         const mapBoundsControls = document.getElementById('mapBoundsControls');
         const searchInput = document.getElementById('searchInput');
+        const canvas = document.getElementById('radarChart');
     //Elements End
     
     //Functionalities Start
@@ -416,28 +414,6 @@
             jsonWindow.document.write('<pre>' + coordinatesJson + '</pre>');
         });
 
-        document.getElementById('updateValueButton').addEventListener('click', function() {
-            var newValue = document.getElementById('valueInput').value;
-            if (newValue !== null && !isNaN(newValue) && newValue >= 0 && newValue <= 9) {
-                var latStr = document.getElementById('coordinateInput').value.split(',')[0].trim();
-                var latParts = latStr.split('.');
-                if (latParts.length == 2) {
-                    var decimals = latParts[1].padEnd(11, '0').split('');
-                    decimals[decimals.length - 6 + selectedChartIndex] = newValue;
-                    latParts[1] = decimals.join('');
-                    var newLat = `${latParts[0]}.${latParts[1]}`;
-                    document.getElementById('coordinateInput').value = `${newLat}, ${document.getElementById('coordinateInput').value.split(',')[1].trim()}`;
-                    updateRadarChart(decimals.slice(-6).map(Number));
-
-                    // Update the first coordinate in coordinatesJSON
-                    if (pathCoordinates.length > 0) {
-                        pathCoordinates[0].lat = parseFloat(newLat);
-                        updateCoordinatesJSON();
-                    }
-                }
-            }
-        });
-
         imageInput.addEventListener('change', function(event) {
             var file = event.target.files[0];
             var reader = new FileReader();
@@ -615,9 +591,9 @@
             const name = document.getElementById('nameInput').value;
             const info = document.getElementById('infoInput').value;
             const type = pathCoordinates.length === 1 ? 1 : (pathCoordinates.length === 0 ? "" : 2);
-            var hexagonData = [];
+            
 
-            const firstCoordinate = (pathCoordinates.length > 0) ? [pathCoordinates[0].lat, pathCoordinates[0].lng] : ["", ""];
+            const firstCoordinate = (pathCoordinates.length > 0) ? [pathCoordinates[0].lat.toFixed(5), pathCoordinates[0].lng.toFixed(5)] : ["", ""];
             console.log("firstCoordinate.lat: " + firstCoordinate);
 
             const metadata = {
@@ -691,8 +667,7 @@
                     } else {
                         pathStartMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
                     }
-                    document.getElementById('coordinateInput').value = `${e.latlng.lat.toFixed(11)}, ${e.latlng.lng.toFixed(11)}`;
-                    updateRadarChartFromInput();
+                    document.getElementById('coordinateInput').value = `${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
 
                     pathCoordinates = [e.latlng];
 
@@ -700,11 +675,8 @@
                         var marker = event.target;
                         var position = marker.getLatLng();
                         pathCoordinates[0] = position;
-                        document.getElementById('coordinateInput').value = `${position.lat.toFixed(11)}, ${position.lng.toFixed(11)}`;
-                        updateRadarChartFromInput();
+                        document.getElementById('coordinateInput').value = `${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}`;
                     });
-
-                    // Enable the add path button after adding the first coordinate
                     firstCoordinateAdded = true;
                     document.getElementById('addPathButton').disabled = false;
 
@@ -775,7 +747,7 @@
                 popup
                     .setLatLng(popupLatLng)
                     .setContent(`
-                        Coordinates: ${e.latlng.lat.toFixed(11)}, ${e.latlng.lng.toFixed(11)}
+                        Coordinates: ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}
                     `)
                     .on('click', removePopupAndMarker)
                     .openOn(map);
@@ -851,25 +823,14 @@
     //Toggle End
 
     //Radar start
-        function updateRadarChart(data) {
-            radarChart.data.datasets[0].data = data;
-            radarChart.update();
-        }
-
-        function updateRadarChartFromInput() {
-            var latStr = document.getElementById('coordinateInput').value.split(',')[0].trim();
-            var data = getLast6DigitsFromLat(parseFloat(latStr));
-            updateRadarChart(data);
-        }
-
         var ctx = document.getElementById('radarChart').getContext('2d');
         var radarChart = new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: domainMetadata.hexagon,
+                labels: ["1 label","2 label","3 label","4 label","5 label","6 label"],
                 datasets: [{
-                    label: 'Data',
-                    data: [0, 0, 0, 0, 0, 0],
+                    label: "Radar",
+                    data: [1, 1, 1, 1, 1, 1],
                     fill: true,
                     backgroundColor: 'rgba(179,181,198,0.2)',
                     borderColor: 'rgba(179,181,198,1)',
@@ -917,20 +878,38 @@
             },
             plugins: [ChartDataLabels]
         });
-        
-        radarChart.options.onClick = function(evt, item) {
-            if (item.length > 0) {
-                selectedChartIndex = item[0].index;
-                var latStr = document.getElementById('coordinateInput').value.split(',')[0].trim();
-                var latParts = latStr.split('.');
-                if (latParts.length == 2) {
-                    var decimals = latParts[1].padEnd(11, '0').split('');
-                    var currentValue = decimals[decimals.length - 6 + selectedChartIndex];
-                    document.getElementById('valueInput').value = currentValue;
-                    document.getElementById('valueInputContainer').style.display = 'flex';
+
+        canvas.addEventListener('mousemove', function(event) {
+            var points = radarChart.getElementsAtEventForMode(event, 'nearest', { intersect: false }, true);
+            if (points.length) {
+                canvas.style.cursor = 'pointer';
+            } else {
+                canvas.style.cursor = 'default';
+            }
+        });
+
+        canvas.addEventListener('click', function(event) {
+            var points = radarChart.getElementsAtEventForMode(event, 'nearest', { intersect: false }, true);
+            if (points.length) {
+                // Get the first clicked point
+                var firstPoint = points[0];
+                var labelIndex = firstPoint.index;
+                var label = radarChart.data.labels[labelIndex];
+                var currentValue = radarChart.data.datasets[0].data[labelIndex];
+                var newValue = prompt(`Enter new value for ${label}:`, currentValue);
+                if (newValue !== null) {
+                    radarChart.data.datasets[0].data[labelIndex] = parseFloat(newValue);
+                    radarChart.update();
+                    hexagonData = radarChart.data.datasets[0].data;
                 }
             }
-        };
+        });
+
+        function updateRadarChartLabels(newLabels) {
+            radarChart.data.labels = newLabels;
+            console.log('newLabels:', newLabels);
+            radarChart.update();
+        }
     //Radar End
 
     //Functions START
@@ -966,14 +945,14 @@
         function updateImageBoundsDisplay() {
             if (imageOverlay) {
                 var bounds = imageOverlay.getBounds();
-                document.getElementById('southwestCoords').textContent = `${bounds.getSouthWest().lat.toFixed(11)}, ${bounds.getSouthWest().lng.toFixed(11)}`;
-                document.getElementById('northeastCoords').textContent = `${bounds.getNorthEast().lat.toFixed(11)}, ${bounds.getNorthEast().lng.toFixed(11)}`;
+                document.getElementById('southwestCoords').textContent = `${bounds.getSouthWest().lat.toFixed(5)}, ${bounds.getSouthWest().lng.toFixed(5)}`;
+                document.getElementById('northeastCoords').textContent = `${bounds.getNorthEast().lat.toFixed(5)}, ${bounds.getNorthEast().lng.toFixed(5)}`;
             }
         }
 
         function updateCoordinatesJSON() {
             var formattedCoordinates = pathCoordinates.map(latlng => {
-                return [latlng.lat.toFixed(11), latlng.lng.toFixed(11)];
+                return [latlng.lat.toFixed(5), latlng.lng.toFixed(5)];
             });
             var coordinatesJson = JSON.stringify({ coordinates: formattedCoordinates }, null, 2);
             document.getElementById('coordinatesDisplay').textContent = coordinatesJson;
@@ -1014,9 +993,15 @@
             }
             console.log('Pathscribe Domain ID:', DomainInscriptionId);
             //Find metadata of domain
-             domainMetadata = await getInscriptionMetadata(DomainInscriptionId);
-            console.log('Domain Metadata:', domainMetadata.hexagon);
-            console.log('Domain Metadata:', domainMetadata.hexagon[0]);
+            domainMetadata = await getInscriptionMetadata(DomainInscriptionId);
+    
+            //Update Hagagon labels
+            if (domainMetadata && Array.isArray(domainMetadata.hexagon)) {
+                console.log('Domain Metadata.hexagon is array:', domainMetadata);
+                updateRadarChartLabels(domainMetadata.hexagon);
+            } else {
+                console.error('Error: domainMetadata.hexagon is not an array or is undefined.', domainMetadata.hexagon);
+            }
 
             const pathscribers = await findAllPathscriberChildren(DomainInscriptionId, domain);
             if (pathscribers === null) {
@@ -1343,7 +1328,7 @@
             document.getElementById('darknessContainer').style.display = 'none';
         }
     //Obsarvatory END
-    
+
         //change to Onload webpage
         setup();
     </script>
