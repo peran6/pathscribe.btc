@@ -85,9 +85,8 @@ body {
     transform: translateX(100%);
 }
 
-#togglePathScribeButton:hover, #addPathButton:hover, #clearMapButton:hover {
-
-background-color: #596bbd;
+#togglePathScribeButton:hover, #addPathButton:hover {
+    background-color: #596bbd;
 }
 #togglePathScribeButton.active, #addPathButton.active {
 
@@ -105,7 +104,7 @@ background-color: #68ba7f;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-size: 14px; 
 }
-#toggleLocationButton,#clearMapButton{
+#toggleLocationButton{
     padding: 8px;
     background: #002f6c;
     border-radius: 5px;
@@ -117,6 +116,19 @@ background-color: #68ba7f;
     width: 100%; 
     font-size: 14px; 
 }
+#clearMapButton,#removeMapButton {
+    padding: 10px;
+    margin: 8px;
+    background: #FF3131;
+    border-radius: 5px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 50%; 
+    font-size: 14px;
+}
 #removeButton, #toggleTileLayerButton, #createContentButton, #editSouthWestButton, #editNorthEastButton, #fullSizeButton, #createProfileButton, #createDomainButton, #createMetadataButton, #createExtraButton, .copyButton {
     padding: 8px;
     background: #FDA403;
@@ -126,8 +138,8 @@ background-color: #68ba7f;
     cursor: pointer;
     margin-bottom: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Full width buttons */
-    font-size: 14px; /* Improved readability */
+    width: 100%; 
+    font-size: 14px; 
 }
 #removeButton:hover, #toggleTileLayerButton:hover, #createContentButton:hover, #editSouthWestButton:hover, #editNorthEastButton:hover, #fullSizeButton:hover, #createProfileButton:hover, #createDomainButton:hover, #createMetadataButton:hover, #createExtraButton:hover, .copyButton:hover {
     background-color: #E8751A;
@@ -138,10 +150,11 @@ background-color: #68ba7f;
 #toggleLocationButton.active{
     background-color: #68ba7f;
 }
-/*#clearMapButton:hover{
-    background-color: #596bbd;
-}*/
- #editSouthWestButton.active, #editNorthEastButton.active, #fullSizeButton.active {
+#mapBoundsControls{
+    padding: 8px;
+    background-color: #f0ebea;
+}
+#editSouthWestButton.active, #editNorthEastButton.active, #fullSizeButton.active {
     background-color: #898121;
 }
 #createContentButton {
