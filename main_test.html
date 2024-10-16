@@ -13,6 +13,9 @@
     <div class="container">
         <div class="map-container" id="mapContainer">
             <div id="map"></div>
+            <div id="radarChartContainer" >
+                <canvas id="radarChartMap"></canvas>
+            </div>
         </div>
         <div id="searchContainer">
             <button id="homeButton" onclick="setup()">🏠</button>
@@ -207,6 +210,7 @@
 
         let profileMarkers = []; // Array to store created markers
         var popup = L.popup(); // Define the popup globally
+        var radarChartMap;
 
     //Elements Start
         const copyButtons = document.querySelectorAll('.copyButton');
@@ -879,6 +883,8 @@
             plugins: [ChartDataLabels]
         });
 
+        
+
         canvas.addEventListener('mousemove', function(event) {
             var points = radarChart.getElementsAtEventForMode(event, 'nearest', { intersect: false }, true);
             if (points.length) {
@@ -1031,7 +1037,7 @@
             for (const data of inscriptionData) {
                 const option = document.createElement('option');
                 option.value = data.inscriptionId;
-                option.textContent = data.content;
+                option.textContent = data.metadata.name + " - " + data.content;
                 locationSelect.appendChild(option);
 
                 // Create at the map the Pathscribers
@@ -1045,19 +1051,170 @@
         }
 
         // Function to update the profile image marker
-        function createProfileMarker(imageUrl, coordinates, data) {
+        async function createProfileMarker(imageUrl, coordinates, data) {
+            
             const icon = L.divIcon({
                 className: 'profile-image-marker',
                 html: `<div style="width: 30px; height: 30px; background-image: url(${imageUrl}); background-size: cover; border-radius: 50%; border: 2px solid red;"></div>`
             });
             const profileImageMarker = L.marker([coordinates[0], coordinates[1]], { icon: icon }).addTo(map);
-            const popupContent = `<strong>Pathscriber:</strong> ${data.content}<br><strong>Name:</strong> ${data.metadata.name}<br><strong>Target:</strong> ${data.metadata.target}`;
+            const popupContent = `<strong>Pathscriber:</strong> ${data.content}<br><strong>Name:</strong> ${data.metadata.name}<br><strong>Target:</strong> ${data.metadata.target}<br><strong>InscriptionId:</strong> ${data.inscriptionId}`;
             profileImageMarker.bindPopup(popupContent);
-            profileImageMarker.on('click', function () {
+            
+            profileImageMarker.on('click', async function () {
+                console.log('Inscription ID Selected:', data.inscriptionId);
+                createPathsMarker(data.inscriptionId);
                 profileImageMarker.openPopup();
             });
+
             return profileImageMarker; 
         }
+
+        async function createPathsMarker(ProfileInscriptionId) {
+            const pathData = [];
+            
+            const paths = await getChildrenInscriptions(ProfileInscriptionId); 
+            console.log('children Paths:', paths);
+
+            for (const inscriptionId of paths) {
+                const content = await fetchInscriptionContent(inscriptionId);
+                console.log('Inscription Content:', content);
+                const metadata = await getInscriptionMetadata(inscriptionId);
+                console.log('Metadata:', metadata);
+
+                pathData.push({
+                    inscriptionId: inscriptionId,
+                    content: content,
+                    metadata: metadata
+                });
+                console.log('pathData:', pathData);
+
+                var data = JSON.parse(content);
+                var latlngs = data.coordinates;
+                var polyline = L.polyline(latlngs, { color: 'red' }).addTo(map);
+                importedPolylines.push(polyline);
+
+                if (latlngs && latlngs.length > 0) {
+                    const startPoint = latlngs[0];
+
+                    if (latlngs.length === 1) {
+                        const marker = L.marker(startPoint, { 
+                            icon: L.icon({
+                                iconUrl: 'img/blue_pin.png',
+                                iconSize: [25, 30], 
+                                iconAnchor: [12, 30]
+                            })
+                        }).addTo(map);
+
+                        marker.bindPopup(`
+                            <strong>Name:</strong> ${metadata.name}<br>
+                            <strong>Info:</strong> ${metadata.info}<br>
+                            <strong>Inscription ID:</strong> ${inscriptionId}
+                        `);
+                    } else {
+                        const startMarker = L.marker(startPoint, { 
+                            icon: L.icon({
+                                iconUrl: 'img/green_pin.png',
+                                iconSize: [25, 30], 
+                                iconAnchor: [12, 30]
+                            })
+                        }).addTo(map);
+
+                        startMarker.bindPopup(`
+                            <strong>Name:</strong> ${metadata.name}<br>
+                            <strong>Info:</strong> ${metadata.info}<br>
+                            <strong>Inscription ID:</strong> ${inscriptionId}
+                        `);
+
+                        startMarker.on('click', function() {
+                            // Call the createRadarChart function with hexagonData from metadata
+                            createRadarChart(metadata.name, metadata.hexagonData, domainMetadata.hexagon);
+                        });
+
+                        const endPoint = latlngs[latlngs.length - 1];
+                        const endMarker = L.marker(endPoint, { 
+                            icon: L.icon({
+                                iconUrl: 'img/red_pin.png',
+                                iconSize: [25, 30], 
+                                iconAnchor: [12, 30]
+                            })
+                        }).addTo(map);
+
+                        endMarker.bindPopup(`
+                            <strong>Name:</strong> ${metadata.name}<br>
+                            <strong>Info:</strong> ${metadata.info}<br>
+                            <strong>Inscription ID:</strong> ${inscriptionId}
+                        `);
+                    }
+
+                    map.fitBounds(polyline.getBounds());
+                }
+            }
+        }
+
+        function createRadarChart(label,values,labels) {
+            var ctx = document.getElementById('radarChartMap').getContext('2d');
+
+            if (radarChartMap) {
+                radarChartMap.destroy();
+            }
+            radarChartMap = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: values,
+                        fill: true,
+                        backgroundColor: 'rgba(179,181,198,0.2)',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 9,
+                            ticks: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 9,
+                                stepSize: 1,
+                                display: false
+                            },
+                            grid: {
+                                circular: true
+                            },
+                            pointLabels: {
+                                fontSize: 12
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            color: '#36A2EB',
+                            anchor: 'end',
+                            align: 'end',
+                            formatter: function(value, context) {
+                                if(value==9 ||  value==0){
+                                    return null;
+                                }else{
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+
         function updateProfileImageMarker(latlng) {
             if (profileLocationMarker) {
                 map.removeLayer(profileLocationMarker);
