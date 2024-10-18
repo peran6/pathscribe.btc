@@ -1,10 +1,11 @@
-# pathscribe.btc
-PathScribe.btc is a Decentralised Map on Bitcoin. 
+# PathScribe.btc
 
-Map
-https://peran6.github.io/pathscribe.btc/main_test
+PathScribe.btc is a Decentralised Map on Bitcoin.
 
-Documentation
-https://app.gitbook.com/invite/BKF4HnxrjwQ7g0aqTY3N/WlDu4Sy312Lze0ouLmMv](https://pathscribe-btc.gitbook.io/documentation-pathscribe.btc
+<img src="app_logo.png" style="width: 200px;" alt="App Logo">
 
+## Map
+[https://peran6.github.io/pathscribe.btc/main_test](https://peran6.github.io/pathscribe.btc/main_test)
 
+## Documentation
+[https://pathscribe-btc.gitbook.io/documentation-pathscribe.btc](https://pathscribe-btc.gitbook.io/documentation-pathscribe.btc)
