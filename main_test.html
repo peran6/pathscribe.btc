@@ -227,13 +227,11 @@
             tileLayer.addTo(map);
             document.getElementById('toggleTileLayerButton').textContent = 'Disable Tile Layer';
 
-            try {
-                const bitmapNumber = 114588;
-                searchInput.value = bitmapNumber;
-                fetchPathscribers(114588);
-            } catch (error) {
-                console.error('Error during setup:', error);
-            }
+            const bitmapNumber = 114588;
+            searchInput.value = bitmapNumber;
+            await fetchPathscribers(114588);
+
+            createRadarChart("Map" ,[],domainMetadata.hexagon);
 
             await initializeYellowDot();
             setInterval(checkForNewBlock, 30000); // Check for new block every 30 seconds
